@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Events;
+using UnityEngine.iOS;
 using UnityEngine.SceneManagement;
 #if UNITY_IPHONE
 using UnityEngine.iOS;
@@ -10,7 +11,7 @@ using UnityEngine.iOS;
 using UnityEngine.Android;
 #endif
 
-namespace Wildlife.Escape
+namespace Barliesque.SceneManagement
 {
 
 	public class SceneLoader : MonoBehaviour
@@ -18,6 +19,7 @@ namespace Wildlife.Escape
 		[Tooltip("If no other scene is loaded, this scene group will be loaded immediately.")]
 		[SerializeField] private int _startGroup = 0;
 		[SerializeField] private SceneGroup[] _sceneGroups;
+		[SerializeField] private ActivityIndicatorStyle _activityIndicator = ActivityIndicatorStyle.White;
 		[SerializeField] private bool _debugLogging;
 
 		static private SceneLoader _inst;
@@ -249,9 +251,9 @@ namespace Wildlife.Escape
 		private void ShowLoadingIndicator()
 		{
 #if UNITY_IPHONE
-			Handheld.SetActivityIndicatorStyle(ActivityIndicatorStyle.Gray);
+			Handheld.SetActivityIndicatorStyle(_activityIndicator);
 #elif UNITY_ANDROID
-			Handheld.SetActivityIndicatorStyle(ActivityIndicatorStyle.Small);
+			Handheld.SetActivityIndicatorStyle(_activityIndicator);
 #endif
 		}
 

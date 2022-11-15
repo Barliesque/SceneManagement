@@ -3,10 +3,10 @@ using UnityEngine;
 using UnityEngine.SceneManagement;
 
 
-namespace Wildlife.Escape
+namespace Barliesque.SceneManagement
 {
 
-	[CreateAssetMenu(fileName = "Scene Group", menuName = "Joker's Escape/Scene Group")]
+	[CreateAssetMenu(fileName = "Scene Group", menuName = "Barliesque/Scene Group")]
 	public class SceneGroup : ScriptableObject
 	{
 

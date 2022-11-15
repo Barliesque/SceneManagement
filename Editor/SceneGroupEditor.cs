@@ -1,7 +1,7 @@
 ﻿using Barliesque.InspectorTools.Editor;
 using UnityEditor;
 
-namespace Wildlife.Escape.Editor
+namespace Barliesque.SceneManagement.Editor
 {
 	[CustomEditor(typeof(SceneGroup))]
 	public class SceneGroupEditor : EditorBase<SceneGroup>
