@@ -18,12 +18,16 @@ namespace Barliesque.SceneManagement
 		[Serializable]
 		public class Item
 		{
+			[SerializeField] public SceneField sceneField;
+			[Tooltip("If disabled, the scene will not be loaded.")]
 			[SerializeField] private bool _disabled;
+			[Tooltip("If selected, the scene will be removed if it's in the outgoing group and reloaded if it's in the incoming group.")]
+			[SerializeField] public bool alwaysReload;
+			[Tooltip("Will this be the main scene of the group?  If selected, lighting settings associated with this scene will be used.  This will also be the default target for newly instantiated GameObjects.")]
+			[SerializeField] public bool setActive;
+			
 			public bool enabled => !_disabled;
-			public SceneField sceneField;
 			public Scene scene => SceneManager.GetSceneByPath(sceneField.SceneName);
-			public bool alwaysReload;
-			public bool setActive;
 
 			override public string ToString()
 			{
@@ -52,7 +56,7 @@ namespace Barliesque.SceneManagement
 			return null;
 		}
 
-		/*
+		
 		public bool Contains(Scene scene)
 		{
 			foreach (var item in Scenes)
@@ -64,7 +68,7 @@ namespace Barliesque.SceneManagement
 			}
 			return false;
 		}
-		*/
+		
 
 		override public string ToString()
 		{
