@@ -3,7 +3,6 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Events;
-using UnityEngine.iOS;
 using UnityEngine.SceneManagement;
 #if UNITY_IPHONE
 using UnityEngine.iOS;
@@ -19,9 +18,19 @@ namespace Barliesque.SceneManagement
 		[Tooltip("If no other scene is loaded, this scene group will be loaded immediately.")]
 		[SerializeField] private int _startGroup = 0;
 		[SerializeField] private SceneGroup[] _sceneGroups;
-		[SerializeField] private ActivityIndicatorStyle _activityIndicator = ActivityIndicatorStyle.White;
+		[SerializeField] private ActivityIndicator _activityIndicator = ActivityIndicator.White;
 		[SerializeField] private bool _debugLogging;
 
+
+		private enum ActivityIndicator
+		{
+			DontShow = -1,
+			WhiteLarge = 0,
+			White = 1,
+			Gray = 2,
+		}
+		
+		
 		static private SceneLoader _inst;
 		static public bool IsBusyLoading { get; private set; } = false;
 
@@ -251,9 +260,9 @@ namespace Barliesque.SceneManagement
 		private void ShowLoadingIndicator()
 		{
 #if UNITY_IPHONE
-			Handheld.SetActivityIndicatorStyle(_activityIndicator);
+			Handheld.SetActivityIndicatorStyle((ActivityIndicatorStyle)_activityIndicator);
 #elif UNITY_ANDROID
-			Handheld.SetActivityIndicatorStyle(_activityIndicator);
+			Handheld.SetActivityIndicatorStyle((AndroidActivityIndicatorStyle)_activityIndicator);
 #endif
 		}
 
