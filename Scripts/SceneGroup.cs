@@ -22,12 +22,16 @@ namespace Barliesque.SceneManagement
 			[Tooltip("If disabled, the scene will not be loaded.")]
 			[SerializeField] private bool _disabled;
 			[Tooltip("If selected, the scene will be removed if it's in the outgoing group and reloaded if it's in the incoming group.")]
-			[SerializeField] public bool alwaysReload;
+			[SerializeField] private bool _alwaysReload;
 			[Tooltip("Will this be the main scene of the group?  If selected, lighting settings associated with this scene will be used.  This will also be the default target for newly instantiated GameObjects.")]
-			[SerializeField] public bool setActive;
+			[SerializeField] private bool _setActive;
 			
 			public bool enabled => !_disabled;
 			public Scene scene => SceneManager.GetSceneByPath(sceneField.SceneName);
+
+			public bool SetActive => _setActive;
+
+			public bool AlwaysReload => _alwaysReload;
 
 			override public string ToString()
 			{

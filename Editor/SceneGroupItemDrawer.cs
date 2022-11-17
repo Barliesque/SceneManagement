@@ -11,14 +11,16 @@ namespace Barliesque.SceneManagement.Editor
 	{
 		override public void CustomDrawer()
 		{
-			Field(50f, "Disable", 20f, "_disabled");
+			Space(10f);
+			Field(50f, "Disable", 34f, "_disabled");
 			var disabled = Property.FindPropertyRelative("_disabled").boolValue;
 			GUI.enabled = !disabled;
 
-			Field(100f, "Always Reload?", 20f, "alwaysReload");
-			Field(70f, "Set Active", 20f, "setActive");
+			Field(70f, "Set Active", 34f, "_setActive");
+			Field(90f, "Always Reload", 34f, "_alwaysReload");
 			NextLine();
-			Field(290f, "sceneField");
+			Space(10f);
+			Field(310f, "sceneField");
 
 			GUI.enabled = true;
 		}

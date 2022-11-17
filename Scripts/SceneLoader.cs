@@ -118,6 +118,10 @@ namespace Barliesque.SceneManagement
 			_inst.StartCoroutine(_inst.LoadGroup(group, onLoaded));
 		}
 
+		static public void Load(SceneGroup group, Action onLoaded = null)
+		{
+			_inst.StartCoroutine(_inst.LoadGroup(group, onLoaded));
+		}
 
 		static public void Load(int groupIndex, Action onLoaded = null)
 		{
@@ -172,7 +176,7 @@ namespace Barliesque.SceneManagement
 
 				// If the scene is already loaded and it doesn't have to always be reloaded, then it's a keeper
 				var keeper = group.Find(_current[i]);
-				if (keeper == null || keeper.alwaysReload)
+				if (keeper == null || keeper.AlwaysReload)
 				{
 					if (_debugLogging) Debug.Log($">>>> Unload: {_current[i]}");
 					var scene = SceneManager.GetSceneByPath(_current[i]);
@@ -242,7 +246,7 @@ namespace Barliesque.SceneManagement
 
 			if (index >= 0)
 			{
-				if (_toBeLoaded[index].setActive)
+				if (_toBeLoaded[index].SetActive)
 				{
 					SceneManager.SetActiveScene(scene);
 				}
