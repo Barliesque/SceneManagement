@@ -29,7 +29,8 @@ namespace Barliesque.SceneManagement.Editor
 
 		override protected void CustomInspector(SceneGroup inst)
 		{
-			if (_groups == null) UpdateGroupsList();
+			if (_groups == null || _sceneGroups == null) UpdateGroupsList();
+			
 			var start = GetProperty("_startGroup");
 			start.intValue = EditorGUILayout.Popup("Start Group", start.intValue, _groups);
 			EditorGUILayout.Space();
@@ -38,6 +39,7 @@ namespace Barliesque.SceneManagement.Editor
 			_sceneGroups.DoLayoutList();
 			if (EditorGUI.EndChangeCheck()) UpdateGroupsList();
 
+			PropertyField("_activityIndicator");
 			PropertyField("_onPreLoad");
 			PropertyField("_onLoadComplete");
 			PropertyField("_debugLogging");
