@@ -20,6 +20,8 @@ namespace Barliesque.SceneManagement
 		[SerializeField] private SceneGroup[] _sceneGroups;
 		[SerializeField] private ActivityIndicator _activityIndicator = ActivityIndicator.White;
 		[SerializeField] private bool _debugLogging;
+		[SerializeField] private UnityEvent _onPreLoad;
+		[SerializeField] private UnityEvent _onLoadComplete;
 
 
 		private enum ActivityIndicator
@@ -34,34 +36,30 @@ namespace Barliesque.SceneManagement
 		static private SceneLoader _inst;
 		static public bool IsBusyLoading { get; private set; } = false;
 
-		static private int _currentGroup = int.MaxValue;
-		static public int CurrentGroup => _currentGroup;
+		static public int CurrentGroup { get; private set; } = int.MaxValue;
+		static public int PreviousGroup { get; private set; } = -1;
+
 		static public string CurrentGroupName
 		{
 			get {
-				if (_currentGroup < 0 || _currentGroup >= _inst._sceneGroups.Length)
+				if (CurrentGroup < 0 || CurrentGroup >= _inst._sceneGroups.Length)
 				{
 					return null;
 				}
-				return _inst._sceneGroups[_currentGroup].name;
+				return _inst._sceneGroups[CurrentGroup].name;
 			}
 		}
 
-		static private int _prevGroup = -1;
-		static public int PreviousGroup => _prevGroup;
 		static public string PreviousGroupName
 		{
 			get {
-				if (_prevGroup < 0 || _prevGroup >= _inst._sceneGroups.Length)
+				if (PreviousGroup < 0 || PreviousGroup >= _inst._sceneGroups.Length)
 				{
 					return null;
 				}
-				return _inst._sceneGroups[_prevGroup].name;
+				return _inst._sceneGroups[PreviousGroup].name;
 			}
 		}
-
-		[SerializeField] private UnityEvent _onPreLoad;
-		[SerializeField] private UnityEvent _onLoadComplete;
 		
 		/// <summary>
 		/// Invoked when a scene load is initiated.  Note that listeners to this action are automatically removed after being invoked.
@@ -72,11 +70,12 @@ namespace Barliesque.SceneManagement
 		/// Invoked when a scene load completes.  Note that listeners to this action are automatically removed after being invoked.
 		/// </summary>
 		static public event Action OnLoadComplete;
+		
 
 		private string _thisScenePath;
 		private Action _onLoaded;
 		private List<SceneGroup.Item> _toBeLoaded;
-		private List<string> _current = new List<string>();
+		private List<string> _current = new();
 
 
 		private void Awake()
@@ -142,8 +141,8 @@ namespace Barliesque.SceneManagement
 			if (_debugLogging) Debug.Log($">>>>> LOAD GROUP:  {group.name}");
 			
 			_onLoaded = onLoaded;
-			_prevGroup = _currentGroup;
-			_currentGroup = Array.IndexOf(_sceneGroups, group);
+			PreviousGroup = CurrentGroup;
+			CurrentGroup = Array.IndexOf(_sceneGroups, group);
 			IsBusyLoading = true;
 
 			try {
@@ -307,7 +306,7 @@ namespace Barliesque.SceneManagement
 
 		private void LoadCompleted()
 		{
-			if (_sceneGroups[_currentGroup].TetrahedralizeProbes)
+			if (_sceneGroups[CurrentGroup].TetrahedralizeProbes)
 			{
 				LightProbes.Tetrahedralize();
 			}
