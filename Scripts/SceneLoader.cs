@@ -89,10 +89,15 @@ namespace Barliesque.SceneManagement
 
 			// This scene may never be unloaded, since it contains the SceneLoader
 			_thisScenePath = gameObject.scene.path;
+		}
 
+		private IEnumerator Start()
+		{
 			_toBeLoaded = new List<SceneGroup.Item>();
-
 			GetCurrentScenes();
+
+			yield return null;
+			
 			if (_current.Count == 1) Load(_startGroup);
 		}
 
