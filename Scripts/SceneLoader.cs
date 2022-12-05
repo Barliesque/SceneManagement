@@ -34,7 +34,6 @@ namespace Barliesque.SceneManagement
 		
 		
 		static private SceneLoader _inst;
-		static public bool IsBusyLoading { get; private set; } = false;
 
 		static public int CurrentGroup { get; private set; } = int.MaxValue;
 		static public int PreviousGroup { get; private set; } = -1;
@@ -59,6 +58,19 @@ namespace Barliesque.SceneManagement
 				}
 				return _inst._sceneGroups[PreviousGroup].name;
 			}
+		}
+
+
+		static public bool IsBusyLoading { get; private set; } = false;
+		
+		static public Coroutine WaitUntilLoaded() => _inst.StartCoroutine(WaitUntilLoadCompleted());
+
+		static private IEnumerator WaitUntilLoadCompleted()
+		{
+			do
+			{
+				yield return null;
+			} while (IsBusyLoading);
 		}
 		
 		/// <summary>
