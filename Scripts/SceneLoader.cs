@@ -160,6 +160,7 @@ namespace Barliesque.SceneManagement
 			_onLoaded = onLoaded;
 			PreviousGroup = CurrentGroup;
 			CurrentGroup = Array.IndexOf(_sceneGroups, group);
+			if (CurrentGroup < 0) Debug.LogError($"SceneGroup \"{group.name}\" needs to be added to the SceneLoader's list.");
 			IsBusyLoading = true;
 
 			try {
@@ -323,7 +324,7 @@ namespace Barliesque.SceneManagement
 
 		private void LoadCompleted()
 		{
-			if (_sceneGroups[CurrentGroup].TetrahedralizeProbes)
+			if (CurrentGroup >= 0 && _sceneGroups[CurrentGroup].TetrahedralizeProbes)
 			{
 				LightProbes.Tetrahedralize();
 			}
