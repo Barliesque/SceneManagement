@@ -150,6 +150,21 @@ namespace Barliesque.SceneManagement
 			_inst.StartCoroutine(_inst.LoadGroup(_inst._sceneGroups[groupIndex], onLoaded));
 		}
 
+		
+		/// <summary>
+		/// Ensure a SceneGroup is added to the loader.
+		/// </summary>
+		/// <param name="group">The SceneGroup to be added.</param>
+		/// <returns>Returns the index of the SceneLoader, whether it was added or found to already be in the list.</returns>
+		static public int AddSceneGroup(SceneGroup group)
+		{
+			var found = Array.IndexOf(_inst._sceneGroups, group);
+			if (found >= 0) return found;
+			IList<SceneGroup> groups = _inst._sceneGroups;
+			groups.Add(group);
+			return groups.Count - 1;
+		}
+
 
 		private IEnumerator LoadGroup(SceneGroup group, Action onLoaded)
 		{
