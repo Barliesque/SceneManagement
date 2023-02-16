@@ -37,6 +37,7 @@ namespace Barliesque.SceneManagement
 
 		static public int CurrentGroup { get; private set; } = int.MaxValue;
 		static public int PreviousGroup { get; private set; } = -1;
+		static public bool FirstLoad => (PreviousGroup < 0 || PreviousGroup >= _inst._sceneGroups.Length);
 
 		static public string CurrentGroupName
 		{
@@ -158,11 +159,16 @@ namespace Barliesque.SceneManagement
 		/// <returns>Returns the index of the SceneLoader, whether it was added or found to already be in the list.</returns>
 		static public int AddSceneGroup(SceneGroup group)
 		{
-			var found = Array.IndexOf(_inst._sceneGroups, group);
+			var sceneList = _inst._sceneGroups;
+			var found = Array.IndexOf(sceneList, group);
 			if (found >= 0) return found;
-			IList<SceneGroup> groups = _inst._sceneGroups;
-			groups.Add(group);
-			return groups.Count - 1;
+			
+			var newArray = new SceneGroup[sceneList.Length + 1];
+			Array.Copy(_inst._sceneGroups, newArray, sceneList.Length);
+			var last = sceneList.Length;
+			newArray[sceneList.Length] = group;
+			_inst._sceneGroups = newArray;
+			return last;
 		}
 
 
