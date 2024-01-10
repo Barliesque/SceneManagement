@@ -104,7 +104,12 @@ namespace Barliesque.SceneManagement
 			_thisScenePath = gameObject.scene.path;
 		}
 
-		private IEnumerator<float> _Start()
+		private void Start()
+		{
+			Timing.RunCoroutine(_LoadStartGroup());
+		}
+
+		private IEnumerator<float> _LoadStartGroup()
 		{
 			_toBeLoaded = new List<SceneGroup.Item>();
 			GetCurrentScenes();
