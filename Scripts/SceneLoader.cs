@@ -152,7 +152,7 @@ namespace Barliesque.SceneManagement
 				Debug.LogError("The SceneLoader is not instantiated and cannot load the next scene group.");
 				return;
 			}
-			if (_inst._sceneGroups.Length <= groupIndex) throw new Exception($"Group index [{groupIndex}] not defined in the SceneLoader component!");
+			if (groupIndex >= _inst._sceneGroups.Length) throw new Exception($"Group index [{groupIndex}] not defined in the SceneLoader component!");
 			Timing.RunCoroutine(_inst._LoadGroup(_inst._sceneGroups[groupIndex], onLoaded));
 		}
 
@@ -181,20 +181,23 @@ namespace Barliesque.SceneManagement
 		{
 			if (!group) throw new Exception($"SceneGroup is null!");
 			if (IsBusyLoading) throw new Exception($"SceneLoader cannot load {group.name} because it is busy loading {CurrentGroupName}");
-			if (_debugLogging) Debug.Log($"[SceneLoader]  Load Group:  {group.name}");
 			
 			_onLoaded = onLoaded;
 			PreviousGroup = CurrentGroup;
 			CurrentGroup = Array.IndexOf(_sceneGroups, group);
-			if (CurrentGroup < 0) Debug.LogError($"[SceneLoader]  SceneGroup \"{group.name}\" needs to be added to the SceneLoader's list.");
+			
+			if (_debugLogging) Debug.Log($"<color=green>[SceneLoader]</color>  Load Group:  {group.name} (Index {CurrentGroup})");
+			if (CurrentGroup < 0) Debug.LogError($"<color=green>[SceneLoader]</color>  SceneGroup \"{group.name}\" needs to be added to the SceneLoader's list.");
 			IsBusyLoading = true;
 
+			if (_debugLogging && _onPreLoad != null) Debug.Log($"<color=green>[SceneLoader]</color>  OnPreLoad events");
 			try {
 				_onPreLoad?.Invoke();
 			} catch (Exception e) { Debug.LogException(e); }
 
 			yield return Timing.WaitForOneFrame;
 
+			if (_debugLogging && OnPreLoad != null) Debug.Log($"<color=green>[SceneLoader]</color>  OnPreLoad events (scripted)");
 			try {
 				OnPreLoad?.Invoke();
 			} catch (Exception e) { Debug.LogException(e); }
@@ -211,6 +214,7 @@ namespace Barliesque.SceneManagement
 					_toBeLoaded.Add(group.Scenes[i]);
 				}
 			}
+			if (_debugLogging) Debug.Log($"<color=green>[SceneLoader]</color>  Unload outgoing scene(s)");
 
 			//  Unload scenes not in this group (and scenes that should always be reloaded)
 			for (int i = _current.Count - 1; i >= 0; i--)
@@ -221,13 +225,13 @@ namespace Barliesque.SceneManagement
 				var keeper = group.Find(_current[i]);
 				if (keeper == null || keeper.AlwaysReload)
 				{
-					if (_debugLogging) Debug.Log($"[SceneLoader]  Unload: {_current[i]}");
+					if (_debugLogging) Debug.Log($"<color=green>[SceneLoader]</color>  Unload: {_current[i]}");
 					var scene = SceneManager.GetSceneByPath(_current[i]);
 					SceneManager.UnloadSceneAsync(scene, UnloadSceneOptions.UnloadAllEmbeddedSceneObjects);
 				}
 				else
 				{
-					if (_debugLogging) Debug.Log($"[SceneLoader]  Keep: {_current[i]}");
+					if (_debugLogging) Debug.Log($"<color=green>[SceneLoader]</color>  Keep: {_current[i]}");
 
 					// Already loaded?  Remove from the list of scenes to be loaded
 					for (int j = 0; j < _toBeLoaded.Count; j++)
@@ -247,13 +251,14 @@ namespace Barliesque.SceneManagement
 
 			if (_toBeLoaded.Count > 0)
 			{
+				if (_debugLogging) Debug.Log($"<color=green>[SceneLoader]</color>  Load {_toBeLoaded.Count} incoming scene(s)");
 				SceneManager.sceneLoaded += SceneLoaded;
 
 				// Start loading new scenes
 				for (int i = 0; i < _toBeLoaded.Count; i++)
 				{
 					var item = _toBeLoaded[i];
-					if (_debugLogging) Debug.Log($"[SceneLoader]  Load {item.sceneField.SceneName}");
+					if (_debugLogging) Debug.Log($"<color=green>[SceneLoader]</color>  Load {item.sceneField.SceneName}");
 					var op = SceneManager.LoadSceneAsync(item.sceneField, LoadSceneMode.Additive);
 					// TODO:  Push op to a stack and monitor op.progress to return total progress (remap 0-0.9 to 0-1.0, because last 10% can't be monitored) 
 					// TODO:  Use an optional Gauge<float> to send progress?
@@ -261,7 +266,7 @@ namespace Barliesque.SceneManagement
 			}
 			else
 			{
-				if (_debugLogging) Debug.Log("[SceneLoader]  Nothing to load!");
+				if (_debugLogging) Debug.Log("<color=green>[SceneLoader]</color>  Nothing to load!");
 				LoadCompleted();
 			}
 		}
@@ -279,7 +284,7 @@ namespace Barliesque.SceneManagement
 
 		private void SceneLoaded(Scene scene, LoadSceneMode mode)
 		{
-			if (_debugLogging) Debug.Log($"[SceneLoader]  Loaded Scene: {scene.path}  IsValid: {scene.IsValid()}  IsLoaded: {scene.isLoaded}");
+			if (_debugLogging) Debug.Log($"<color=green>[SceneLoader]</color>  Loaded Scene: {scene.path}  IsValid: {scene.IsValid()}  IsLoaded: {scene.isLoaded}");
 			var index = _toBeLoaded.FindIndex((s) =>
 			{
 				var a = scene.path;
@@ -324,7 +329,7 @@ namespace Barliesque.SceneManagement
 
 		private IEnumerator<float> _Complete()
 		{
-			if (_debugLogging) Debug.Log("[SceneLoader]  Finishing up...");
+			if (_debugLogging) Debug.Log("<color=green>[SceneLoader]</color>  Finishing up...");
 			SceneManager.sceneLoaded -= SceneLoaded;
 			
 			yield return Timing.WaitForSeconds(HideLoadingIndicator());
@@ -336,7 +341,7 @@ namespace Barliesque.SceneManagement
 			{
 				yield return Timing.WaitForOneFrame;
 				var fps = 1f / Time.unscaledDeltaTime;
-				if (_debugLogging) Debug.Log($"[SceneLoader]  {i} sec, FPS: {fps}");
+				if (_debugLogging) Debug.Log($"<color=green>[SceneLoader]</color>  {i} sec, FPS: {fps}");
 				if (fps >= targetFPS)
 				{
 					break;
@@ -345,7 +350,7 @@ namespace Barliesque.SceneManagement
 
 			IsBusyLoading = false;
 			LoadCompleted();
-			if (_debugLogging) Debug.Log($"[SceneLoader]  LOAD COMPLETED: {CurrentGroupName}");
+			if (_debugLogging) Debug.Log($"<color=green>[SceneLoader]</color>  LOAD COMPLETED: {CurrentGroupName}");
 		}
 
 		private void LoadCompleted()
