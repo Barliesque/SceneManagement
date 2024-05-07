@@ -5,6 +5,8 @@ using UnityEngine;
 [CustomPropertyDrawer(typeof(SceneField))]
 public class SceneFieldPropertyDrawer : PropertyDrawer
 {
+	static private int _inst;
+	
 	override public void OnGUI(Rect position, SerializedProperty property, GUIContent label)
 	{
 		EditorGUI.BeginProperty(position, GUIContent.none, property);
@@ -15,8 +17,9 @@ public class SceneFieldPropertyDrawer : PropertyDrawer
 		{
 			EditorGUI.BeginChangeCheck();
 			var value = EditorGUI.ObjectField(position, sceneAsset.objectReferenceValue, typeof(SceneAsset), false);
-			
-			if (EditorGUI.EndChangeCheck()) // || (value?.name ?? null) != sceneName.stringValue)
+
+			var inst = property.GetHashCode();
+			if (EditorGUI.EndChangeCheck() || _inst != inst) // || (value?.name ?? null) != sceneName.stringValue)
 			{
 				sceneAsset.objectReferenceValue = value;
 				if (sceneAsset.objectReferenceValue != null)
@@ -27,6 +30,7 @@ public class SceneFieldPropertyDrawer : PropertyDrawer
 					scenePath = scenePath.Substring(assetsIndex, extensionIndex - assetsIndex);
 					sceneName.stringValue = scenePath;
 				}
+				_inst = inst;
 			}
 		}
 		EditorGUI.EndProperty();
