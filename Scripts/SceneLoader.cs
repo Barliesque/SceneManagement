@@ -258,7 +258,7 @@ namespace Barliesque.SceneManagement
 				for (int i = 0; i < _toBeLoaded.Count; i++)
 				{
 					var item = _toBeLoaded[i];
-					if (_debugLogging) Debug.Log($"<color=green>[SceneLoader]</color>  Load {item.sceneField.SceneName}");
+					if (_debugLogging) Debug.Log($"<color=green>[SceneLoader]</color>  Load {item.sceneField.ScenePath}");
 					var op = SceneManager.LoadSceneAsync(item.sceneField, LoadSceneMode.Additive);
 					// TODO:  Push op to a stack and monitor op.progress to return total progress (remap 0-0.9 to 0-1.0, because last 10% can't be monitored) 
 					// TODO:  Use an optional Gauge<float> to send progress?
@@ -288,7 +288,7 @@ namespace Barliesque.SceneManagement
 			var index = _toBeLoaded.FindIndex((s) =>
 			{
 				var a = scene.path;
-				var b = $"Assets/{s.sceneField.SceneName}.unity";
+				var b = $"Assets/{s.sceneField.ScenePath}.unity";
 				return a == b;
 			});
 

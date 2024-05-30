@@ -2,7 +2,7 @@
 using UnityEditor;
 using UnityEngine;
 
-[CustomPropertyDrawer(typeof(SceneField))]
+[CustomPropertyDrawer(typeof(SceneField)), Obsolete("SceneField has been superseded by SceneReference")]
 public class SceneFieldPropertyDrawer : PropertyDrawer
 {
 	static private int _inst;

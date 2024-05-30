@@ -20,10 +20,21 @@ namespace Barliesque.SceneManagement.Editor
 			Field(90f, "Always Reload", 34f, "_alwaysReload");
 			NextLine();
 			Space(10f);
-			Field(310f, "sceneField");
+			SceneField(310f, "sceneField");
 
 			GUI.enabled = true;
 		}
+		
+		private SerializedProperty SceneField(float fieldWidth, string field)
+		{
+			var prop = Property.FindPropertyRelative(field);
+			_position.width = fieldWidth < 0f ? (_rect.width - _position.x) : fieldWidth;
+			_position.height = EditorGUI.GetPropertyHeight(prop);
+			SceneReferencePropertyDrawer.DrawField(_position, prop, GUIContent.none, false);
+			_position.x += fieldWidth + HorizSpacing;
+			return prop;
+		}
+		
 
 
 	}

@@ -9,7 +9,7 @@ using Object = UnityEngine.Object;
 /// See also: https://gist.github.com/JohannesMP/ec7d3f0bcf167dab3d0d3bb480e0e07b
 /// </summary>
 
-[Serializable]
+[Serializable, Obsolete("Use SceneReference instead.")]
 public class SceneField
 {
 	[SerializeField] private Object sceneAsset;

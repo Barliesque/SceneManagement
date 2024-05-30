@@ -1,6 +1,7 @@
 ﻿using System;
 using UnityEngine;
 using UnityEngine.SceneManagement;
+using UnityEngine.Serialization;
 
 
 namespace Barliesque.SceneManagement
@@ -18,7 +19,7 @@ namespace Barliesque.SceneManagement
 		[Serializable]
 		public class Item
 		{
-			[SerializeField] public SceneField sceneField;
+			[SerializeField] public SceneReference sceneField;
 			[Tooltip("If disabled, the scene will not be loaded.")]
 			[SerializeField] private bool _disabled;
 			[Tooltip("If selected, the scene will be removed if it's in the outgoing group and reloaded if it's in the incoming group.")]
@@ -27,7 +28,7 @@ namespace Barliesque.SceneManagement
 			[SerializeField] private bool _setActive;
 			
 			public bool enabled => !_disabled;
-			public Scene scene => SceneManager.GetSceneByPath(sceneField.SceneName);
+			public Scene scene => SceneManager.GetSceneByPath(sceneField.ScenePath);
 
 			public bool SetActive => _setActive;
 
@@ -35,13 +36,13 @@ namespace Barliesque.SceneManagement
 
 			override public string ToString()
 			{
-				return $"SceneGroup.Item: {sceneField.SceneName}";
+				return $"SceneGroup.Item: {sceneField.ScenePath}";
 			}
 
 			public bool IsScene(string scenePath)
 			{
 				var a = scenePath;
-				var b = $"Assets/{sceneField.SceneName}.unity";
+				var b = $"Assets/{sceneField.ScenePath}.unity";
 				var c = (a == b);
 				return c;
 			}
