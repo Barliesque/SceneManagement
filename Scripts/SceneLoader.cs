@@ -248,7 +248,7 @@ namespace Barliesque.SceneManagement
 			ShowLoadingIndicator();
 			// Wait a frame to allow the indicator to display
 			yield return Timing.WaitForOneFrame;
-
+			
 			if (_toBeLoaded.Count > 0)
 			{
 				if (_debugLogging) Debug.Log($"<color=green>[SceneLoader]</color>  Load {_toBeLoaded.Count} incoming scene(s)");
@@ -271,9 +271,11 @@ namespace Barliesque.SceneManagement
 			}
 		}
 
+		/// <summary>
+		/// Get a list of the scenes currently open.  See: _current
+		/// </summary>
 		private void GetCurrentScenes()
 		{
-			// First get a list of the scenes currently open
 			_current.Clear();
 			for (int i = 0; i < SceneManager.sceneCount; i++)
 			{
@@ -285,12 +287,7 @@ namespace Barliesque.SceneManagement
 		private void SceneLoaded(Scene scene, LoadSceneMode mode)
 		{
 			if (_debugLogging) Debug.Log($"<color=green>[SceneLoader]</color>  Loaded Scene: {scene.path}  IsValid: {scene.IsValid()}  IsLoaded: {scene.isLoaded}");
-			var index = _toBeLoaded.FindIndex((s) =>
-			{
-				var a = scene.path;
-				var b = $"Assets/{s.sceneField.ScenePath}.unity";
-				return a == b;
-			});
+			var index = _toBeLoaded.FindIndex((s) => scene.path == s.sceneField.ScenePath);
 
 			if (index >= 0)
 			{
