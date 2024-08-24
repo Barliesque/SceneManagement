@@ -281,6 +281,40 @@ namespace Barliesque.SceneManagement
 			{
 				_current.Add(SceneManager.GetSceneAt(i).path);
 			}
+			
+			if (CurrentGroup < _sceneGroups.Length) return;
+			
+			// Try to determine which scene group is already loaded
+			for (var index = 0; index < _sceneGroups.Length; index++)
+			{
+				var group = _sceneGroups[index];
+				var matched = true;
+				// Go through each scene required by this group...
+				foreach (var item in group.Scenes)
+				{
+					var found = false;
+					// Is that scene currently loaded?
+					foreach (var loaded in _current)
+					{
+						if (item.sceneField.ScenePath != loaded) continue;
+						found = true;
+						break;
+					}
+
+					// If that scene was found, continue looking for remaining scenes in this group
+					if (found) continue;
+
+					matched = false;
+					break;
+				}
+
+				// Not a match?  Consider the next scene group
+				if (!matched) continue;
+
+				// Matched!
+				CurrentGroup = index;
+				break;
+			}
 		}
 
 
