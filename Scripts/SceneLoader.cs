@@ -17,7 +17,7 @@ namespace Barliesque.SceneManagement
 	{
 		[Tooltip("If no other scene is loaded, this scene group will be loaded immediately.")]
 		[SerializeField] private int _startGroup = 0;
-		[SerializeField] private SceneGroup[] _sceneGroups;
+		[SerializeField] private SceneSelect[] _sceneGroups;
 		[SerializeField] private ActivityIndicator _activityIndicator = ActivityIndicator.White;
 		[SerializeField] private bool _debugLogging;
 		[SerializeField] private UnityEvent _onPreLoad;
@@ -31,13 +31,25 @@ namespace Barliesque.SceneManagement
 			White = 1,
 			Gray = 2,
 		}
-		
+
+		[Serializable]
+		public struct SceneSelect
+		{
+			public SceneGroup group;
+			[Tooltip("Override the default ID for this scene group?")]
+			public bool customID;
+			[Tooltip("Custom ID by which this scene group will be referenced.")]
+			public string id;
+
+			public string name => customID ? id : group.name;
+		}
 		
 		static private SceneLoader _inst;
 
 		static public int CurrentGroup { get; private set; } = int.MaxValue;
 		static public int PreviousGroup { get; private set; } = -1;
 		static public bool FirstLoad => (PreviousGroup < 0 || PreviousGroup >= _inst._sceneGroups.Length);
+
 
 		static public string CurrentGroupName
 		{
@@ -120,30 +132,44 @@ namespace Barliesque.SceneManagement
 		}
 
 
-		static public void Load(string groupName, Action onLoaded = null)
+		static public void Load(string id, Action onLoaded = null)
 		{
 			// Find the specified SceneGroup
 			SceneGroup group = null;
-			foreach (var g in _inst._sceneGroups)
+			int index;
+			for (index = 0; index < _inst._sceneGroups.Length; index++)
 			{
-				if (g.name == groupName)
+				var g = _inst._sceneGroups[index];
+				if (g.name == id)
 				{
-					group = g;
+					group = g.group;
 					break;
 				}
 			}
-			if (group == null)
-			{
-				throw new Exception($"Unknown group name: \"{groupName}\"");
-			}
+			if (!group) throw new Exception($"Unknown group name: \"{id}\"");
 
-			Timing.RunCoroutine(_inst._LoadGroup(group, onLoaded));
+			Timing.RunCoroutine(_inst._LoadGroup(index, id, group, onLoaded));
 		}
+		
 
 		static public void Load(SceneGroup group, Action onLoaded = null)
 		{
-			Timing.RunCoroutine(_inst._LoadGroup(group, onLoaded));
+			bool found = false;
+			int index;
+			for (index = 0; index < _inst._sceneGroups.Length; index++)
+			{
+				var g = _inst._sceneGroups[index];
+				if (g.group == group)
+				{
+					group = g.group;
+					found = true;
+					break;
+				}
+			}
+			
+			Timing.RunCoroutine(_inst._LoadGroup(found ? index : int.MaxValue, group.name, group, onLoaded));
 		}
+		
 
 		static public void Load(int groupIndex, Action onLoaded = null)
 		{
@@ -153,41 +179,43 @@ namespace Barliesque.SceneManagement
 				return;
 			}
 			if (groupIndex >= _inst._sceneGroups.Length) throw new Exception($"Group index [{groupIndex}] not defined in the SceneLoader component!");
-			Timing.RunCoroutine(_inst._LoadGroup(_inst._sceneGroups[groupIndex], onLoaded));
+			var select = _inst._sceneGroups[groupIndex];
+			Timing.RunCoroutine(_inst._LoadGroup(groupIndex, select.id, select.group, onLoaded));
 		}
 
-		
+
 		/// <summary>
 		/// Ensure a SceneGroup is added to the loader.
 		/// </summary>
 		/// <param name="group">The SceneGroup to be added.</param>
+		/// <param name="id">Optional id by which the SceneGroup will be referenced.  If not assigned, the group's name is used.</param>
 		/// <returns>Returns the index of the SceneLoader, whether it was added or found to already be in the list.</returns>
-		static public int AddSceneGroup(SceneGroup group)
+		static public int AddSceneGroup(SceneGroup group, string id = null)
 		{
 			var sceneList = _inst._sceneGroups;
 			var found = Array.IndexOf(sceneList, group);
 			if (found >= 0) return found;
 			
-			var newArray = new SceneGroup[sceneList.Length + 1];
+			var newArray = new SceneSelect[sceneList.Length + 1];
 			Array.Copy(_inst._sceneGroups, newArray, sceneList.Length);
 			var last = sceneList.Length;
-			newArray[sceneList.Length] = group;
+			newArray[sceneList.Length] = new SceneSelect { group = group, id = id, customID = !string.IsNullOrEmpty(id) };
 			_inst._sceneGroups = newArray;
 			return last;
 		}
 
 
-		private IEnumerator<float> _LoadGroup(SceneGroup group, Action onLoaded)
+		private IEnumerator<float> _LoadGroup(int index, string id, SceneGroup group, Action onLoaded)
 		{
 			if (!group) throw new Exception($"SceneGroup is null!");
-			if (IsBusyLoading) throw new Exception($"SceneLoader cannot load {group.name} because it is busy loading {CurrentGroupName}");
+			if (IsBusyLoading) throw new Exception($"SceneLoader cannot load {id} because it is busy loading {CurrentGroupName}");
 			
 			_onLoaded = onLoaded;
 			PreviousGroup = CurrentGroup;
-			CurrentGroup = Array.IndexOf(_sceneGroups, group);
+			CurrentGroup = index; // Array.IndexOf(_sceneGroups, select);
 			
-			if (_debugLogging) Debug.Log($"<color=green>[SceneLoader]</color>  Load Group:  {group.name} (Index {CurrentGroup})");
-			if (CurrentGroup < 0) Debug.LogError($"<color=green>[SceneLoader]</color>  SceneGroup \"{group.name}\" needs to be added to the SceneLoader's list.");
+			if (_debugLogging) Debug.Log($"<color=green>[SceneLoader]</color>  Load Group:  {id} (Index {CurrentGroup})");
+			if (CurrentGroup < 0) Debug.LogError($"<color=green>[SceneLoader]</color>  SceneGroup \"{id}\" needs to be added to the SceneLoader's list.");
 			IsBusyLoading = true;
 
 			if (_debugLogging && _onPreLoad != null) Debug.Log($"<color=green>[SceneLoader]</color>  OnPreLoad events");
@@ -287,10 +315,10 @@ namespace Barliesque.SceneManagement
 			// Try to determine which scene group is already loaded
 			for (var index = 0; index < _sceneGroups.Length; index++)
 			{
-				var group = _sceneGroups[index];
+				var select = _sceneGroups[index];
 				var matched = true;
 				// Go through each scene required by this group...
-				foreach (var item in group.Scenes)
+				foreach (var item in select.group.Scenes)
 				{
 					var found = false;
 					// Is that scene currently loaded?
@@ -386,7 +414,7 @@ namespace Barliesque.SceneManagement
 
 		private void LoadCompleted()
 		{
-			if (CurrentGroup >= 0 && _sceneGroups[CurrentGroup].TetrahedralizeProbes)
+			if (CurrentGroup >= 0 && _sceneGroups[CurrentGroup].group.TetrahedralizeProbes)
 			{
 				LightProbes.Tetrahedralize();
 			}
@@ -418,5 +446,28 @@ namespace Barliesque.SceneManagement
 				else if (Input.GetKeyDown(KeyCode.F)) Load(5);
 			}
 		}
+		
+		static private string[] _groupNames;
+
+		static public string[] GroupNames
+		{
+			get
+			{
+				if (_groupNames == null) UpdateGroupNames();
+				return _groupNames;
+			}
+		}
+
+		static public void UpdateGroupNames()
+		{
+			_inst ??= FindObjectOfType<SceneLoader>();
+			var count = _inst?._sceneGroups.Length ?? 0;
+			_groupNames = new string[count];
+			for (int i = 0; i < count; i++)
+			{
+				_groupNames[i] = _inst._sceneGroups[i].name;
+			}
+		}
+		
 	}
 }

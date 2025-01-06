@@ -6,8 +6,6 @@ namespace Barliesque.SceneManagement.Editor
 	[CustomEditor(typeof(SceneLoader))]
 	public class SceneLoaderEditor : EditorBase<SceneGroup>
 	{
-		private string[] _groups;
-
 		private ListEditor _sceneGroups;
 
 		override protected void OnEnabled(SceneGroup inst)
@@ -18,21 +16,16 @@ namespace Barliesque.SceneManagement.Editor
 		private void UpdateGroupsList()
 		{
 			_sceneGroups ??= new ListEditor(serializedObject, "_sceneGroups", "Scene Groups");
-
-			_groups = new string[_sceneGroups.Count];
-			for (int i = 0; i < _groups.Length; i++)
-			{
-				var group = _sceneGroups.GetElement(i).objectReferenceValue;
-				_groups[i] = group ? group.name : $"Group {i}";
-			}
+			_sceneGroups.ShowIndex = true;
+			SceneLoader.UpdateGroupNames();
 		}
 
 		override protected void CustomInspector(SceneGroup inst)
 		{
-			if (_groups == null || _sceneGroups == null) UpdateGroupsList();
+			if (_sceneGroups == null) UpdateGroupsList();
 			
 			var start = GetProperty("_startGroup");
-			start.intValue = EditorGUILayout.Popup("Start Group", start.intValue, _groups);
+			start.intValue = EditorGUILayout.Popup("Start Group", start.intValue, SceneLoader.GroupNames);
 			EditorGUILayout.Space();
 
 			EditorGUI.BeginChangeCheck();
