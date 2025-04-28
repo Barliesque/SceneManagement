@@ -41,7 +41,7 @@ namespace Barliesque.SceneManagement
 			[Tooltip("Custom ID by which this scene group will be referenced.")]
 			public string id;
 
-			public string name => customID ? id : group.name;
+			public string name => customID ? id : group?.name ?? string.Empty;
 		}
 		
 		static private SceneLoader _inst;
