@@ -1,3 +1,6 @@
 using UnityEngine;
 
-public class SceneGroupIDAttribute : PropertyAttribute { }
+namespace Barliesque.SceneManagement
+{
+	public class SceneGroupIDAttribute : PropertyAttribute { }
+}
