@@ -468,6 +468,17 @@ namespace Barliesque.SceneManagement
 				_groupNames[i] = _inst._sceneGroups[i].name;
 			}
 		}
+
+		static public string GetSceneID(SceneGroup sceneGroup)
+		{
+			foreach (var selection in _inst._sceneGroups)
+			{
+				if (selection.group != sceneGroup) continue;
+				return selection.id;
+			}
+			Debug.LogError($"SceneGroup {sceneGroup.name} not found in SceneLoader");
+			return null;
+		}
 		
 	}
 }
