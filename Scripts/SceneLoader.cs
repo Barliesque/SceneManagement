@@ -41,6 +41,9 @@ namespace Barliesque.SceneManagement
 			[Tooltip("Custom ID by which this scene group will be referenced.")]
 			public string id;
 
+			/// <summary>
+			/// Returns the SceneGroup ID or, if no ID is assigned, the SceneGroup name.
+			/// </summary>
 			public string name => customID ? id : group?.name ?? string.Empty;
 		}
 		
@@ -474,7 +477,7 @@ namespace Barliesque.SceneManagement
 			foreach (var selection in _inst._sceneGroups)
 			{
 				if (selection.group != sceneGroup) continue;
-				return selection.id;
+				return selection.name;
 			}
 			Debug.LogError($"SceneGroup {sceneGroup.name} not found in SceneLoader");
 			return null;
