@@ -437,6 +437,8 @@ namespace Barliesque.SceneManagement
 			OnLoadComplete = null;
 		}
 
+		//TODO  Use the new Inout system to listen for a hotkey, followed by a number key?  Or maybe allow optional hotkeys to be assigned per group
+		/*
 		private void Update()
 		{
 			if (Input.GetKey(KeyCode.LeftShift) || Input.GetKey(KeyCode.RightShift))
@@ -449,6 +451,7 @@ namespace Barliesque.SceneManagement
 				else if (Input.GetKeyDown(KeyCode.F)) Load(5);
 			}
 		}
+		*/
 		
 		static private string[] _groupNames;
 
