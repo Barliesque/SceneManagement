@@ -136,41 +136,29 @@ public class SceneReferencePropertyDrawer : PropertyDrawer
 		var readOnlyWarning = readOnly ? "\n\nWARNING: Build Settings is not checked out and so cannot be modified." : "";
 
 		// Label Prefix
-		var iconContent = new GUIContent();
+		GUIContent iconContent;
 		var labelContent = new GUIContent();
 
 		// Missing from build scenes
 		if (buildScene.buildIndex == -1)
 		{
-#if UNITY_6000_0_OR_NEWER
-			iconContent = EditorGUIUtility.IconContent("d_redLight");
-#else
-			iconContent = EditorGUIUtility.IconContent("d_winbtn_mac_close");
-#endif
+			iconContent = _redLight;
 			labelContent.text = "NOT In Build";
-			labelContent.tooltip = "This scene is NOT in build settings.\nIt will be NOT included in builds.";
+			labelContent.tooltip = "This scene is NOT in build settings.\nIt will NOT be included in builds.";
 		}
 		// In build scenes and enabled
 		else if (buildScene.scene.enabled)
 		{
-#if UNITY_6000_0_OR_NEWER
-			iconContent = EditorGUIUtility.IconContent("d_greenLight");
-#else
-			iconContent = EditorGUIUtility.IconContent("d_winbtn_mac_max");
-#endif
+			iconContent = _greenLight;
 			labelContent.text = "BuildIndex: " + buildScene.buildIndex;
 			labelContent.tooltip = "This scene is in the build settings and ENABLED.\nIt will be included in builds." + readOnlyWarning;
 		}
 		// In build scenes and disabled
 		else
 		{
-#if UNITY_6000_0_OR_NEWER
-			iconContent = EditorGUIUtility.IconContent("d_orangeLight");
-#else
-			iconContent = EditorGUIUtility.IconContent("d_winbtn_mac_min");
-#endif
+			iconContent = _yellowLight;
 			labelContent.text = "BuildIndex: " + buildScene.buildIndex;
-			labelContent.tooltip = "This scene is in build settings but is DISABLED.\nIt will be NOT included in builds.";
+			labelContent.tooltip = "This scene is in build settings but is DISABLED.\nIt will NOT be included in builds.";
 		}
 
 		// Left status label
@@ -247,36 +235,35 @@ public class SceneReferencePropertyDrawer : PropertyDrawer
 		// Missing from build scenes
 		if (buildScene.buildIndex == -1)
 		{
-#if UNITY_6000_0_OR_NEWER
-			iconContent = EditorGUIUtility.IconContent("d_redLight");
-#else
- 			iconContent = EditorGUIUtility.IconContent("d_winbtn_mac_close");
-#endif
+			iconContent = _redLight;
 			iconContent.tooltip = "This scene is NOT in build settings.  It will NOT be included in builds.";
 		}
 		// In build scenes and enabled
 		else if (buildScene.scene.enabled)
 		{
-#if UNITY_6000_0_OR_NEWER
-			iconContent = EditorGUIUtility.IconContent("d_greenLight");
-#else
-			iconContent = EditorGUIUtility.IconContent("d_winbtn_mac_max");
-#endif
+			iconContent = _greenLight;
 			iconContent.tooltip = $"This scene is in build settings at index [{buildScene.buildIndex}] and is ENABLED.  It will be included in builds." + readOnlyWarning;
 		}
 		// In build scenes but disabled
 		else
 		{
-#if UNITY_6000_0_OR_NEWER
-			iconContent = EditorGUIUtility.IconContent("d_orangeLight");
-#else
-			iconContent = EditorGUIUtility.IconContent("d_winbtn_mac_min");
-#endif
+			iconContent = _yellowLight;
 			iconContent.tooltip = $"This scene is in build settings at index [{buildScene.buildIndex}] but is DISABLED.  It will NOT be included in builds.";
 		}
 
 		GUI.Box(position, iconContent);
 	}
+	
+	
+#if UNITY_6000_0_OR_NEWER
+	static private readonly GUIContent _redLight = new (EditorGUIUtility.IconContent("d_redLight").image);
+	static private readonly GUIContent _greenLight = new (EditorGUIUtility.IconContent("d_greenLight").image);
+	static private readonly GUIContent _yellowLight = new (EditorGUIUtility.IconContent("d_orangeLight").image);
+#else
+	static private readonly GUIContent _redLight = new (EditorGUIUtility.IconContent("d_winbtn_mac_close").image);
+	static private readonly GUIContent _greenLight = new (EditorGUIUtility.IconContent("d_winbtn_mac_max").image);
+	static private readonly GUIContent _yellowLight = new (EditorGUIUtility.IconContent("d_winbtn_mac_min").image);
+#endif
 	
 
 	static private SerializedProperty GetSceneAssetProperty(SerializedProperty property)
