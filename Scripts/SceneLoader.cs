@@ -15,6 +15,7 @@ namespace Barliesque.SceneManagement
 
 	public class SceneLoader : MonoBehaviour
 	{
+		[SerializeField] private bool _loadOnStart = true;
 		[Tooltip("If no other scene is loaded, this scene group will be loaded immediately.")]
 		[SerializeField] private int _startGroup = 0;
 		[SerializeField] private SceneSelect[] _sceneGroups;
@@ -118,17 +119,19 @@ namespace Barliesque.SceneManagement
 			// This scene may never be unloaded, since it contains the SceneLoader
 			_thisScenePath = gameObject.scene.path;
 		}
+		
 
 		private void Start()
 		{
-			Timing.RunCoroutine(_LoadStartGroup());
+			_toBeLoaded = new List<SceneGroup.Item>();
+			GetCurrentScenes();
+			
+			if (_loadOnStart) Timing.RunCoroutine(_LoadStartGroup());
 		}
+		
 
 		private IEnumerator<float> _LoadStartGroup()
 		{
-			_toBeLoaded = new List<SceneGroup.Item>();
-			GetCurrentScenes();
-
 			yield return Timing.WaitForOneFrame;
 			
 			if (_current.Count == 1) Load(_startGroup);

@@ -1,5 +1,6 @@
 ﻿using Barliesque.InspectorTools.Editor;
 using UnityEditor;
+using UnityEngine;
 
 namespace Barliesque.SceneManagement.Editor
 {
@@ -24,8 +25,14 @@ namespace Barliesque.SceneManagement.Editor
 		{
 			if (_sceneGroups == null) UpdateGroupsList();
 			
-			var start = GetProperty("_startGroup");
-			start.intValue = EditorGUILayout.Popup("Start Group", start.intValue, SceneLoader.GroupNames);
+			var loadOnStart = PropertyField("_loadOnStart").boolValue;
+			if (loadOnStart)
+			{
+				EditorGUI.indentLevel++;
+				var start = GetProperty("_startGroup");
+				start.intValue = EditorGUILayout.Popup("Start Group", start.intValue, SceneLoader.GroupNames);
+				EditorGUI.indentLevel--;
+			}
 			EditorGUILayout.Space();
 
 			EditorGUI.BeginChangeCheck();
@@ -33,6 +40,7 @@ namespace Barliesque.SceneManagement.Editor
 			if (EditorGUI.EndChangeCheck()) UpdateGroupsList();
 
 			PropertyField("_activityIndicator");
+			EditorGUILayout.Space();
 			PropertyField("_onPreLoad");
 			PropertyField("_onLoadComplete");
 			PropertyField("_debugLogging");
