@@ -488,6 +488,15 @@ namespace Barliesque.SceneManagement
 			Debug.LogError($"SceneGroup {sceneGroup.name} not found in SceneLoader");
 			return null;
 		}
+
+		static public bool SceneExists(string sceneID)
+		{
+			foreach (var group in _inst._sceneGroups)
+			{
+				if (group.id == sceneID) return true;
+			}
+			return false;
+		}
 		
 	}
 }
