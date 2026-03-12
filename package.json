@@ -1,0 +1,13 @@
+{
+  "name": "com.barliesque.scene-management",
+  "displayName": "Scene Management",
+  "version": "1.0.0",
+  "unity": "2021.3",
+  "description": "A system to manage the loading and unloading of scenes and groups of scenes.",
+  "keywords": ["unity", "package", "scenes", "loading"],
+  "author": {
+    "name": "David Barlia",
+    "email": "barliesque@gmail.com"
+  },
+  "license": "MIT"
+}
