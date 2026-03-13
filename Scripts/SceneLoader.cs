@@ -133,8 +133,12 @@ namespace Barliesque.SceneManagement
 		private IEnumerator<float> _LoadStartGroup()
 		{
 			yield return Timing.WaitForOneFrame;
-			
-			if (_current.Count == 1) Load(_startGroup);
+
+			if (_current.Count == 1)
+			{
+				if (_debugLogging) Debug.Log($"<color=green>[SceneLoader]</color>  Load Start Group: {_sceneGroups[_startGroup].name} (Index {_startGroup})");
+				Load(_startGroup);
+			}
 		}
 
 
@@ -186,7 +190,7 @@ namespace Barliesque.SceneManagement
 			}
 			if (groupIndex >= _inst._sceneGroups.Length) throw new Exception($"Group index [{groupIndex}] not defined in the SceneLoader component!");
 			var select = _inst._sceneGroups[groupIndex];
-			Timing.RunCoroutine(_inst._LoadGroup(groupIndex, select.id, select.group, onLoaded));
+			Timing.RunCoroutine(_inst._LoadGroup(groupIndex, select.name, select.group, onLoaded));
 		}
 
 
@@ -469,12 +473,18 @@ namespace Barliesque.SceneManagement
 
 		static public void UpdateGroupNames()
 		{
-			_inst ??= FindObjectOfType<SceneLoader>();
-			var count = _inst?._sceneGroups.Length ?? 0;
+			if (!_inst) _inst = FindFirstObjectByType<SceneLoader>();
+			if (!_inst)
+			{
+				_groupNames = Array.Empty<string>();
+				return;
+			}
+			var groups = _inst._sceneGroups;
+			var count = groups.Length;
 			_groupNames = new string[count];
 			for (int i = 0; i < count; i++)
 			{
-				_groupNames[i] = _inst._sceneGroups[i].name;
+				_groupNames[i] = groups[i].name;
 			}
 		}
 
@@ -493,7 +503,7 @@ namespace Barliesque.SceneManagement
 		{
 			foreach (var group in _inst._sceneGroups)
 			{
-				if (group.id == sceneID) return true;
+				if (group.name == sceneID) return true;
 			}
 			return false;
 		}
