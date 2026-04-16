@@ -29,8 +29,16 @@ namespace Barliesque.SceneManagement.Editor
 			if (loadOnStart)
 			{
 				EditorGUI.indentLevel++;
-				var start = GetProperty("_startGroup");
-				start.intValue = EditorGUILayout.Popup("Start Group", start.intValue, SceneLoader.GroupNames);
+				var groupNames = SceneLoader.GroupNames;
+				if (groupNames == null || groupNames.Length == 0)
+				{
+					PropertyField("_startGroup");
+				}
+				else
+				{
+					var start = GetProperty("_startGroup");
+					start.intValue = EditorGUILayout.Popup("Start Group", start.intValue, groupNames);
+				}
 				EditorGUI.indentLevel--;
 			}
 			EditorGUILayout.Space();
