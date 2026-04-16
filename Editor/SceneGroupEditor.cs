@@ -23,7 +23,9 @@ namespace Barliesque.SceneManagement.Editor
 			for (int i = 0; i < _scenes.Count; i++)
 			{
 				var item = _scenes.GetElement(i);
-				if (item != null && item.FindPropertyRelative("_setActive").boolValue) ++active;
+				if (item != null
+				    && !item.FindPropertyRelative("_disabled").boolValue
+				    && item.FindPropertyRelative("_setActive").boolValue) ++active;
 			}
 
 			if (active == 0) EditorTools.HelpBox("One scene in the group should be set as the active scene.", MessageType.Warning);
