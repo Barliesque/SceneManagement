@@ -91,15 +91,15 @@ namespace Barliesque.SceneManagement
 		}
 		
 		/// <summary>
-		/// Invoked when a scene load is initiated.  Note that listeners to this action are automatically removed after being invoked.
+		/// Invoked when a scene load is initiated.
 		/// </summary>
-		static public event Action OnPreLoad;
+		static public UnityEvent OnPreLoad => _inst._onPreLoad;
 		
 		/// <summary>
-		/// Invoked when a scene load completes.  Note that listeners to this action are automatically removed after being invoked.
+		/// Invoked when a scene load completes.
 		/// </summary>
-		static public event Action OnLoadComplete;
-		
+		static public UnityEvent OnLoadComplete => _inst._onLoadComplete;
+
 
 		private string _thisScenePath;
 		private Action _onLoaded;
@@ -441,7 +441,6 @@ namespace Barliesque.SceneManagement
 			try {
 				OnLoadComplete?.Invoke();
 			} catch (Exception e) { Debug.LogException(e); }
-			OnLoadComplete = null;
 		}
 
 		//TODO  Use the new Inout system to listen for a hotkey, followed by a number key?  Or maybe allow optional hotkeys to be assigned per group
@@ -507,6 +506,19 @@ namespace Barliesque.SceneManagement
 			}
 			return false;
 		}
+		
+
+		static public int GetSceneIndex(string sceneID)
+		{
+			for (int index = 0; index < _inst._sceneGroups.Length; index++)
+			{
+				var g = _inst._sceneGroups[index];
+				if (_inst._sceneGroups[index].name == sceneID) return index;
+			}
+
+			return -1;
+		}
+		
 		
 	}
 }

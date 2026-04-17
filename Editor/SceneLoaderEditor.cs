@@ -1,6 +1,5 @@
 ﻿using Barliesque.InspectorTools.Editor;
 using UnityEditor;
-using UnityEngine;
 
 namespace Barliesque.SceneManagement.Editor
 {
