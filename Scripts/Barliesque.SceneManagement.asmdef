@@ -2,7 +2,7 @@
     "name": "Barliesque.SceneManagement",
     "rootNamespace": "",
     "references": [
-        "Trinary.MEC"
+        "DigitalDust"
     ],
     "includePlatforms": [],
     "excludePlatforms": [],
